@@ -1,21 +1,22 @@
 name: Run jq query
 
 on:
-workflow_dispatch:
+ workflow_dispatch:
 
 jobs:
   run-jq-query:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
       
-    - name: Install jq
-      run: sudo apt-get install jq
+      - name: Install jq
+        run: sudo apt-get install jq
       
-    - name: Run jq query
-      run: jq '.[] | select(.errorCount > 0) | {filePath,messages: [.messages[] | { ruleId: .ruleId, message,line,column}]}' lint.json > output.json
+      - name: Run jq query
+        run: |
+          jq  '.[] | select(.errorCount > 0) | { filePath,messages: [.messages[] | { ruleId: .ruleId, message,line,column}]}' lint.json > output.json
       
-    - name: Display output
-      run: cat output.json
+      - name: Display output
+        run: cat output.json
