@@ -16,6 +16,7 @@ jobs:
         run: |
           mkdir -p $GITHUB_WORKSPACE/html
           jq '.[] | select(.errorCount > 0) | {filePath,messages: [.messages[] | { ruleId: .ruleId, message,line,column}]}' lint.json > errors.json
+          cat errors.json
 
       - name: Generate HTML Table
         run: |
