@@ -1,22 +1,25 @@
-name: Run jq query
+name: Generate HTML Table
 
 on:
- workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-  run-jq-query:
+  generate-table:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
-      
-      - name: Install jq
-        run: sudo apt-get install jq
-      
-      - name: Run jq query
+
+      - name: Run jq to filter JSON
+        id: filter-json
         run: |
-          jq -r '["File Path", "Rule ID", "Message", "Line", "Column"], (.[] | [.filePath, .messages[].ruleId, .messages[].message, .messages[].line, .messages[].column]) | @tsv' lint.json > output.tsv
-      
-      - name: Display output
-        run: cat output.tsv
+          mkdir -p $GITHUB_WORKSPACE/html
+          jq '.[] | select(.errorCount > 0) | {filePath,messages: [.messages[] | { ruleId: .ruleId, message,line,column}]}' lint.json > $GITHUB_WORKSPACE/html/errors.json
+
+      - name: Convert JSON to HTML table
+        if: always()
+        run: |
+          jq -r '.[] | "<tr><td>\(.filePath)</td><td>\(.messages[].ruleId)</td><td>\(.messages[].message)</td><td>\(.messages[].line)</td><td>\(.messages[].column)</td></tr>"' $GITHUB_WORKSPACE/html/errors.json > $GITHUB_WORKSPACE/html/errors.html
+
+
