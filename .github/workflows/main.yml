@@ -21,7 +21,7 @@ jobs:
       - name: Generate HTML Error Table
         run: |
             echo "<html><body><table border='1'><thead><tr><th>File Path</th><th>Rule ID</th><th>Message</th><th>Line</th><th>Column</th></tr></thead><tbody>" > $GITHUB_WORKSPACE/error_table.html
-            jq -r '.[] | "<tr><td>\(.filePath)</td><td>\(.messages[].ruleId)</td><td>\(.messages[].message)</td><td>\(.messages[].line)</td><td>\(.messages[].column)</td></tr>"' error.json | awk '!seen[$0]++' >> $GITHUB_WORKSPACE/error_table.html
+            jq -r '.[] | "<tr><td>\(.filePath)</td><td>\(.messages[].ruleId)</td><td>\(.messages[].message)</td><td>\(.messages[].line)</td><td>\(.messages[].column)</td></tr>"' errors.json | awk '!seen[$0]++' >> $GITHUB_WORKSPACE/error_table.html
             echo "</tbody></table></body></html>" >> $GITHUB_WORKSPACE/error_table.html
 
 
