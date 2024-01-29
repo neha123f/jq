@@ -23,7 +23,7 @@ jobs:
         run: |
                   echo "<html><body><table border='1'><thead><tr><th>File Path</th><th>Rule ID</th><th>Message</th><th>Line</th><th>Column</th></tr></thead><tbody>" > $GITHUB_WORKSPACE/table.html
     
-                      cat errors.json | jq -r 'group_by(.filePath)[] | "<tr><td>\(.[0].filePath)</td><td>\(.[].messages[].ruleId)</td><td>\(.[].messages[].message)</td><td>\(.[].messages[].line)</td><td>\(.[].messages[].column)</td></tr>"' >> $GITHUB_WORKSPACE/table.html
+                      cat errors.json | jq 'group_by(.filePath)[] | "<tr><td>\(.[0].filePath)</td><td>\(.[].messages[].ruleId)</td><td>\(.[].messages[].message)</td><td>\(.[].messages[].line)</td><td>\(.[].messages[].column)</td></tr>"' >> $GITHUB_WORKSPACE/table.html
     
                    echo "</tbody></table></body></html>" >> $GITHUB_WORKSPACE/table.html
 
