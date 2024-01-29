@@ -21,11 +21,11 @@ jobs:
       - name: Generate HTML Table
         if: always()  # Adjust the condition as needed
         run: |
-          echo "<html><body><table border='1'><thead><tr><th>File Path</th><th>Rule ID</th><th>Message</th><th>Line</th><th>Column</th></tr></thead><tbody>" > $GITHUB_WORKSPACE/errors.html
-              cat errors.json | jq -r '.[] | "<tr><td>\(.filePath)</td><td>\(.messages[].ruleId)</td><td>\(.messages[].message)</td><td>\(.messages[].line)</td><td>\(.messages[].column)</td></tr>"' >> $GITHUB_WORKSPACE/errors.html
-    
-             echo "</tbody></table></body></html>" >> $GITHUB_WORKSPACE/errors.html
+            echo  "<html><body><table border='1'><thead><tr><th>File Path</th><th>Rule ID</th><th>Message</th><th>Line</th><th>Column</th></tr></thead><tbody>" > $GITHUB_WORKSPACE/errors.html
 
+            cat errors.json | jq '.[] | "<tr><td>\(.filePath)</td><td>\(.messages[].ruleId)</td><td>\(.messages[].message)</td><td>\(.messages[].line)</td><td>\(.messages[].column)</td></tr>"' >> $GITHUB_WORKSPACE/errors.html
+    
+             echo "</tbody></table></body></html>" >> $GITHUB_WORKSPACE/errors.html          
 
 
 
