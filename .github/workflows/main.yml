@@ -19,13 +19,14 @@ jobs:
           cat errors.json
 
       - name: Generate HTML Table
-        if: always()  # Adjust the condition as needed
-        run: |
-            echo  "<html><body><table border='1'><thead><tr><th>File Path</th><th>Rule ID</th><th>Message</th><th>Line</th><th>Column</th></tr></thead><tbody>" > $GITHUB_WORKSPACE/errors.html
 
-            cat errors.json | jq '.[] | "<tr><td>\(.filePath)</td><td>\(.messages[].ruleId)</td><td>\(.messages[].message)</td><td>\(.messages[].line)</td><td>\(.messages[].column)</td></tr>"' >> $GITHUB_WORKSPACE/errors.html
+        run: |
+                  echo "<html><body><table border='1'><thead><tr><th>File Path</th><th>Rule ID</th><th>Message</th><th>Line</th><th>Column</th></tr></thead><tbody>" > $GITHUB_WORKSPACE/table.html
     
-             echo "</tbody></table></body></html>" >> $GITHUB_WORKSPACE/errors.html          
+                      cat errors.json | jq -r 'group_by(.filePath)[] | "<tr><td>\(.[0].filePath)</td><td>\(.[].messages[].ruleId)</td><td>\(.[].messages[].message)</td><td>\(.[].messages[].line)</td><td>\(.[].messages[].column)</td></tr>"' >> $GITHUB_WORKSPACE/table.html
+    
+                   echo "</tbody></table></body></html>" >> $GITHUB_WORKSPACE/table.html
+
 
 
 
@@ -33,4 +34,4 @@ jobs:
 
 
       - name: Display HTML Table
-        run: cat $GITHUB_WORKSPACE/errors.html >> $GITHUB_STEP_SUMMARY
+        run: cat $GITHUB_WORKSPACE/table.html >> $GITHUB_STEP_SUMMARY
