@@ -24,7 +24,7 @@ jobs:
              filePath=$(echo "$line" | jq -r '.filePath')
           messages=$(echo "$line" | jq -r '.messages[] | "<tr><td>\($filePath)</td><td>\(.ruleId)</td><td>\(.message)</td><td>\(.line)</td><td>\(.column)</td></tr>"')
            echo "$messages"
-            done < error.json >> $GITHUB_WORKSPACE/error_table.html
+            done < errors.json >> $GITHUB_WORKSPACE/error_table.html
          echo "</tbody></table></body></html>" >> $GITHUB_WORKSPACE/error_table.html
 
       - name: Display HTML Table
