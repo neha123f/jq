@@ -20,12 +20,16 @@ jobs:
       - name: Generate HTML Table
         run: |
          echo "<html><body><table border='1'><thead><tr><th>File Path</th><th>Rule ID</th><th>Message</th><th>Line</th><th>Column</th></tr></thead><tbody>" > $GITHUB_WORKSPACE/error_table.html
-         while read -r line; do
-             filePath=$(echo "$line" | jq -r '.filePath')
-          messages=$(echo "$line" | jq -r '.messages[] | "<tr><td>\($filePath)</td><td>\(.ruleId)</td><td>\(.message)</td><td>\(.line)</td><td>\(.column)</td></tr>"')
-           echo "$messages"
-            done < errors.json >> $GITHUB_WORKSPACE/error_table.html
+          while read -r line; do
+         filePath=$(echo "$line" | jq -r '.filePath')
+         messages=$(echo "$line" | jq -r '.messages[] | "<tr><td>\($filePath)</td><td>\(.ruleId)</td><td>\(.message)</td><td>\(.line)</td><td>\(.column)</td></tr>"')
+          echo "$messages"
+          done < errors.json >> $GITHUB_WORKSPACE/error_table.html
          echo "</tbody></table></body></html>" >> $GITHUB_WORKSPACE/error_table.html
+
+      - name: Display HTML Table
+        run: cat $GITHUB_WORKSPACE/error_table.html >> $GITHUB_STEP_SUMMARY
+
 
       - name: Display HTML Table
         run: cat $GITHUB_WORKSPACE/error_table.html >> $GITHUB_STEP_SUMMARY
