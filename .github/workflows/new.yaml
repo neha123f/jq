@@ -1,0 +1,57 @@
+name: Generate HTML Table
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  generate-table:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run jq to filter JSON and check if it's empty
+        id: filter-json
+        run: |
+          jq '[.[] | select(.errorCount > 0) | {filePath,messages: [.messages[] | { ruleId: .ruleId, message,line,column}]}]' lint.json > errors.json
+          if [ ! -s errors.json ]; then
+            echo "errors.json is empty"
+            exit 1
+          fi
+          cat errors.json
+
+      - name: Generate HTML Table
+        if: ${{ steps.filter-json.outcome == 'success' }}  # Only run if previous step succeeded
+        run: |
+          echo "<html><body><table border='1'><thead><tr><th colspan='5'>Linting Files</th></tr><th>File Path</th><th>Rule ID</th><th>Message</th><th>Line</th><th>Column</th></tr></thead><tbody>" > $GITHUB_WORKSPACE/table.html
+          cat errors.json | jq -r '.[] | .filePath as $filePath | .messages[] | "<tr><td>\($filePath)</td><td>\(.ruleId)</td><td>\(.message)</td><td>\(.line)</td><td>\(.column)</td></tr>"' >> $GITHUB_WORKSPACE/table.html
+          echo "</tbody></table></body></html>" >> $GITHUB_WORKSPACE/table.html
+
+      - name: Display HTML Table
+        if: ${{ steps.filter-json.outcome == 'success' }}  # Only run if previous step succeeded
+        run: cat $GITHUB_WORKSPACE/table.html >> $GITHUB_STEP_SUMMARY
+
+      - name: Update Pull Request Description
+        if: ${{ steps.filter-json.outcome == 'success' }}  # Only run if previous step succeeded
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.API_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const summaryHtml = fs.readFileSync('./table.html', 'utf8');
+            const { owner, repo, number } = context.issue;
+            async function updateComment(github) {
+              try {
+                await github.rest.issues.createComment({
+                  owner: owner,
+                  repo: repo,
+                  issue_number: number,
+                  body: `<!--HTML_COMMENT_START-->\n${summaryHtml}\n<!--HTML_COMMENT_END-->`,
+                });
+              } catch (error) {
+                console.error(error.message);
+              }
+            }
+            updateComment(github);
