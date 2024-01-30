@@ -13,6 +13,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run jq to filter JSON and check if it's empty
+        continue-on-error: true
         id: filter-json
         run: |
           jq '[.[] | select(.errorCount > 0) | {filePath,messages: [.messages[] | { ruleId: .ruleId, message,line,column}]}]' lint.json > errors.json
