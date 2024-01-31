@@ -16,7 +16,7 @@ jobs:
         continue-on-error: true
         id: filter-json
         run: |
-          jq '[.[] | select(.errorCount > 0) | {filePath,messages: [.messages[] | { ruleId: .ruleId, message,line,column}]}]' lint.json > errors.json
+          jq '[.[] | select(.errorCount > 0) | {filePath,messages: [.messages[] | select(.severity>1) | { ruleId: .ruleId, message,line,column}]}]' lint.json > errors.json
           if [ ! -s errors.json ]; then
             echo "errors.json is empty"
             exit 1
@@ -27,7 +27,7 @@ jobs:
         if: ${{ steps.filter-json.outcome == 'success' }}  # Only run if previous step succeeded
         run: |
           echo "<html><body><table border='1'><thead><tr><th colspan='5'>Linting Files</th></tr><th>File Path</th><th>Rule ID</th><th>Message</th><th>Line</th><th>Column</th></tr></thead><tbody>" > $GITHUB_WORKSPACE/table.html
-          cat errors.json | jq -r '.[] | .filePath as $filePath | .messages[] | "<tr><td>\($filePath)</td><td>\(.ruleId)</td><td>\(.message)</td><td>\(.line)</td><td>\(.column)</td></tr>"' >> $GITHUB_WORKSPACE/table.html
+          cat errors.json | jq -r '.[] | .filePath as $filePath | .messages[] | "<tr><td>\(( $filePath | split("/") | last ))</td><td>\(.ruleId)</td><td>\(.message)</td><td>\(.line)</td><td>\(.column)</td></tr>"' >> $GITHUB_WORKSPACE/table.html
           echo "</tbody></table></body></html>" >> $GITHUB_WORKSPACE/table.html
 
       - name: Display HTML Table
