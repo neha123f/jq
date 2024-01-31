@@ -13,7 +13,7 @@ jobs:
 
       - name: Run jq to filter JSON
         run: |
-          jq '[.[] | select(.errorCount > 0) | {filePath,messages: [.messages[] | { ruleId: .ruleId, message,line,column}]}]' lint.json > errors.json
+          jq '[.[] | select(.errorCount > 0) | {filePath,messages: [.messages[] | select(.severity > 1) | { ruleId: .ruleId, message,line,column}]}]' lint.json > errors.json
           cat errors.json
       
       - name: Generate HTML Table
